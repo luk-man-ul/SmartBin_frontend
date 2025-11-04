@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const LoginPage = () => {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -17,7 +17,7 @@ const LoginPage = () => {
     setError('');
 
     try {
-      await login(username, password);
+      await login(email, password);
       navigate('/dashboard');
     } catch (err) {
       setError(err.message);
@@ -37,22 +37,22 @@ const LoginPage = () => {
         </p>
         
         <div className="demo-notice">
-          <strong>Demo Mode:</strong> Use any username and password to log in.
+          <strong>Demo Mode:</strong> working on connection.
         </div>
-        
+     
         <form onSubmit={handleSubmit} autoComplete="off">
           <div className="form-group">
-            <label htmlFor="username">Username</label>
+            <label htmlFor="email">Email</label>
             <input
-              type="text"
-              id="username"
-              name="demo-user"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              type="email"
+              id="email"
+              name="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               required
               disabled={loading}
               autoComplete="off"
-              placeholder="Enter any username"
+              placeholder="Enter your email"
             />
           </div>
           
@@ -81,8 +81,15 @@ const LoginPage = () => {
             {loading ? 'Signing in...' : 'Sign In'}
           </button>
         </form>
-        
-        <p style={{ textAlign: 'center', marginTop: '16px', fontSize: '14px' }}>
+
+         <p style={{ textAlign: 'right', marginTop: '6px', fontSize: '14px' }}>
+          {' '}
+          <Link to="">
+            Forgot Password ?
+          </Link>
+        </p>
+         
+        <p style={{ textAlign: 'center', marginTop: '10px', fontSize: '16px' }}>
           Don't have an account?{' '}
           <Link to="/register">
             Create one here
