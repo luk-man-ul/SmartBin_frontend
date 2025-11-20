@@ -17,7 +17,7 @@ const Navbar = () => {
 
   return (
     <nav className="navbar">
-      <h1>Smart Bottle Return</h1>
+      <h1>SmartBin : Bottle Return and reward system</h1>
       <button onClick={handleLogout}>
         Logout
       </button>

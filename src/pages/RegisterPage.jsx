@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const RegisterPage = () => {
-  const [username, setUsername] = useState('');
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -18,19 +18,22 @@ const RegisterPage = () => {
     e.preventDefault();
     setError('');
     setSuccess('');
-    // ✅ Confirm password validation
+
     if (password !== confirmPassword) {
       setError('Passwords do not match');
       return;
     }
+
     setLoading(true);
-    
+
     try {
-      await register(username, email, password);
-      setSuccess('Registration successful! Redirecting to login...');
+      await register(name, email, password);
+
+      setSuccess('Registration successful! Redirecting...');
       setTimeout(() => {
         navigate('/login');
-      }, 2000);
+      }, 1500);
+
     } catch (err) {
       setError(err.message);
     } finally {
@@ -49,22 +52,21 @@ const RegisterPage = () => {
         </p>
         
         <div className="demo-notice">
-          <strong>Demo Mode:</strong> Registration is simulated - no real account is created.
+          <strong>Note:</strong> Data will be saved to the database.
         </div>
         
         <form onSubmit={handleSubmit} autoComplete="off">
+
           <div className="form-group">
-            <label htmlFor="username">Username</label>
+            <label htmlFor="name">Full Name</label>
             <input
               type="text"
-              id="username"
-              name="demo-user"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              id="name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
               required
               disabled={loading}
-              autoComplete="off"
-              placeholder="Choose a username"
+              placeholder="Enter your full name"
             />
           </div>
 
@@ -73,12 +75,10 @@ const RegisterPage = () => {
             <input
               type="email"
               id="email"
-              name="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
               disabled={loading}
-              autoComplete="off"
               placeholder="Enter your email"
             />
           </div>
@@ -88,12 +88,10 @@ const RegisterPage = () => {
             <input
               type="password"
               id="password"
-              name="demo-pass"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
               disabled={loading}
-              autoComplete="off"
               placeholder="Choose a password"
             />
           </div>
@@ -103,12 +101,10 @@ const RegisterPage = () => {
             <input
               type="password"
               id="confirmPassword"
-              name="demo-confirm"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
               disabled={loading}
-              autoComplete="off"
               placeholder="Confirm your password"
             />
           </div>
@@ -127,9 +123,7 @@ const RegisterPage = () => {
         
         <p style={{ textAlign: 'center', marginTop: '16px', fontSize: '14px' }}>
           Already have an account?{' '}
-          <Link to="/login">
-            Sign in here
-          </Link>
+          <Link to="/login">Sign in here</Link>
         </p>
       </div>
     </div>

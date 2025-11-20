@@ -4,10 +4,13 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import PrivateRoute from './components/PrivateRoute';
 import Navbar from './components/Navbar';
 import LoginPage from './pages/LoginPage';
+import ForgotPasswordPage from "./pages/ForgotPasswordPage";
+import OtpVerifyPage from "./pages/OtpVerifyPage";
 import RegisterPage from './pages/RegisterPage';
 import DashboardPage from './pages/DashboardPage';
 import ScannerPage from './pages/ScannerPage';
 import RewardHistoryPage from './pages/RewardHistoryPage';
+import ClaimRewardPage from './pages/ClaimRewardPage';
 import { FaRecycle, FaLeaf, FaGlobeAmericas } from 'react-icons/fa';
 
 // Component to handle root redirect logic
@@ -30,7 +33,7 @@ const VisualSection = () => {
   return (
     <div className="visual-section">
       <div className="visual-content">
-        <h1>Smart Bottle Return</h1>
+        <h1>SmartBin : Bottle return & Reward </h1>
         <p>
           Join the eco-revolution! Return your bottles, earn rewards, and help create a sustainable future for our planet.
         </p>
@@ -53,8 +56,14 @@ const VisualSection = () => {
 // Layout wrapper component
 const LayoutWrapper = ({ children }) => {
   const location = useLocation();
-  const isAuthPage = location.pathname === '/login' || location.pathname === '/register';
-  
+  const isAuthPage =
+  location.pathname === '/login' ||
+  location.pathname === '/register' ||
+  location.pathname === '/forgot-password' ||
+  location.pathname === '/verify-otp'
+  ;
+
+
   if (isAuthPage) {
     return (
       <div className="app-layout auth-layout">
@@ -83,6 +92,8 @@ const AppRoutes = () => {
       <Routes>
         <Route path="/" element={<RootRedirect />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/verify-otp" element={<OtpVerifyPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route 
           path="/dashboard" 
@@ -108,6 +119,9 @@ const AppRoutes = () => {
             </PrivateRoute>
           } 
         />
+        
+        <Route path="/claim" element={<ClaimRewardPage />} />
+
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </LayoutWrapper>

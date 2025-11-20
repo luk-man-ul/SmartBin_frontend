@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   
@@ -17,7 +18,7 @@ const LoginPage = () => {
     setError('');
 
     try {
-      await login(email, password);
+      await login(email, password, rememberMe);
       navigate('/dashboard');
     } catch (err) {
       setError(err.message);
@@ -35,9 +36,10 @@ const LoginPage = () => {
         <p style={{ textAlign: 'center', marginBottom: '24px', color: '#6c757d', fontSize: '14px' }}>
           Sign in to your account
         </p>
-        
+
+        {/* remove demo notice once fully ready */}
         <div className="demo-notice">
-          <strong>Demo Mode:</strong> working on connection.
+          <strong>Note:</strong> OTP based Login available.
         </div>
      
         <form onSubmit={handleSubmit} autoComplete="off">
@@ -67,8 +69,22 @@ const LoginPage = () => {
               required
               disabled={loading}
               autoComplete="off"
-              placeholder="Enter any password"
+              placeholder="Enter your password"
             />
+          </div>
+
+          {/* Remember Me */}
+          <div style={{ width: "100%", marginTop: "10px",marginBottom:"3px",marginLeft: "10px" , display: "flex" }}>
+            <label style={{ display: "flex", alignItems: "center", gap: "6px", cursor: "pointer" }}>
+              <input
+                type="checkbox"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+                disabled={loading}
+                style={{ cursor: "pointer" }}
+              />
+              <span style={{ fontSize: "14px", fontWeight: "500", color: "#333" }}>Remember Me</span>
+            </label>
           </div>
           
           {error && <div className="error">{error}</div>}
@@ -82,18 +98,13 @@ const LoginPage = () => {
           </button>
         </form>
 
-         <p style={{ textAlign: 'right', marginTop: '6px', fontSize: '14px' }}>
-          {' '}
-          <Link to="">
-            Forgot Password ?
-          </Link>
+        <p style={{ textAlign: 'right', marginTop: '6px', fontSize: '14px' }}>
+          <Link to="/forgot-password">Forgot Password?</Link>
         </p>
          
         <p style={{ textAlign: 'center', marginTop: '10px', fontSize: '16px' }}>
           Don't have an account?{' '}
-          <Link to="/register">
-            Create one here
-          </Link>
+          <Link to="/register">Create one here</Link>
         </p>
       </div>
     </div>

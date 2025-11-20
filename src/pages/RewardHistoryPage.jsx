@@ -1,141 +1,79 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { FaArrowLeft, FaTrophy } from 'react-icons/fa';
+import React, { useEffect, useState } from "react";
+import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
-const RewardHistoryPage = () => {
-  const [transactions, setTransactions] = useState([]);
-  const [loading, setLoading] = useState(true);
+export default function RewardHistoryPage() {
+  const { user } = useAuth();
   const navigate = useNavigate();
+  const [history, setHistory] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate fetching transaction history
-    const fetchHistory = () => {
-      setTimeout(() => {
-        const mockTransactions = [
-          {
-            id: 1,
-            date: '2024-01-15',
-            binId: 'BIN001',
-            pointsEarned: 25,
-            location: 'Main Street Mall'
-          },
-          {
-            id: 2,
-            date: '2024-01-14',
-            binId: 'BIN003',
-            pointsEarned: 15,
-            location: 'Central Park'
-          },
-          {
-            id: 3,
-            date: '2024-01-12',
-            binId: 'BIN002',
-            pointsEarned: 30,
-            location: 'University Campus'
-          },
-          {
-            id: 4,
-            date: '2024-01-10',
-            binId: 'BIN001',
-            pointsEarned: 20,
-            location: 'Main Street Mall'
-          },
-          {
-            id: 5,
-            date: '2024-01-08',
-            binId: 'BIN004',
-            pointsEarned: 35,
-            location: 'Shopping Center'
-          }
-        ];
-        setTransactions(mockTransactions);
+    if (!user) return;
+
+    const fetchHistory = async () => {
+      try {
+        const res = await fetch(`http://localhost:5000/api/history/${user._id}`);
+        const data = await res.json();
+        setHistory(data);
+      } catch (err) {
+        console.error("History fetch error:", err);
+      } finally {
         setLoading(false);
-      }, 1500);
+      }
     };
 
     fetchHistory();
-  }, []);
+  }, [user]);
 
-  const goBack = () => {
-    navigate('/dashboard');
-  };
-
-  if (loading) {
-    return (
-      <div className="container">
-        <div className="loading">Loading transaction history...</div>
-      </div>
-    );
-  }
-
-  const totalPoints = transactions.reduce((sum, transaction) => sum + transaction.pointsEarned, 0);
+  if (loading) return <p className="loading">Loading...</p>;
 
   return (
-    <div className="container">
+    <div className="wide-container">
       <div className="card">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+        {/* Top section with title + back button */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: "20px",
+          }}
+        >
           <h2>Reward History</h2>
-          <button 
+          <button
             className="btn btn-secondary"
-            onClick={goBack}
-            style={{ width: 'auto', padding: '8px 16px' }}
+            onClick={() => navigate("/dashboard")}
+            style={{ width: "auto", padding: "8px 14px" }}
           >
-            <FaArrowLeft /> Back
+            ← Back
           </button>
         </div>
-        
-        <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-          <p style={{ color: '#6c757d', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-            <FaTrophy /> Total Points Earned:
-          </p>
-          <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#008080' }}>
-            {totalPoints} Points
-          </div>
-        </div>
 
-        {transactions.length === 0 ? (
-          <p style={{ textAlign: 'center', color: '#6c757d' }}>
-            No transactions found. Start scanning QR codes to earn points!
-          </p>
+        {/* Reward list */}
+        {history.length === 0 ? (
+          <p>No rewards claimed yet.</p>
         ) : (
-          <div style={{ overflowX: 'auto' }}>
-            <table className="table">
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Bin ID</th>
-                  <th>Location</th>
-                  <th>Points</th>
-                </tr>
-              </thead>
-              <tbody>
-                {transactions.map((transaction) => (
-                  <tr key={transaction.id}>
-                    <td>{new Date(transaction.date).toLocaleDateString()}</td>
-                    <td>{transaction.binId}</td>
-                    <td>{transaction.location}</td>
-                    <td style={{ color: '#28a745', fontWeight: 'bold' }}>
-                      +{transaction.pointsEarned}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="reward-list">
+            {history.map((item) => (
+              <div className="reward-card" key={item._id}>
+                <div className="reward-left">
+                  <div className="reward-bottles">
+                    {item.bottles} bottles
+                  </div>
+                  <div className="reward-bin">
+                    From bin <strong>{item.binId}</strong>
+                  </div>
+                </div>
+
+                <div className="reward-date">
+                  {new Date(item.date).toLocaleString()}
+                </div>
+              </div>
+            ))}
           </div>
         )}
       </div>
-      
-      <div className="card">
-        <h3 style={{ marginBottom: '16px' }}>Tips to earn more points:</h3>
-        <ul style={{ paddingLeft: '20px', lineHeight: '1.6' }}>
-          <li>Return bottles regularly to maximize your rewards</li>
-          <li>Look for bonus point events at participating locations</li>
-          <li>Refer friends to earn additional bonus points</li>
-          <li>Check for special promotions in the app</li>
-        </ul>
-      </div>
     </div>
   );
-};
-
-export default RewardHistoryPage;
+}

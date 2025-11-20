@@ -1,19 +1,26 @@
-import React from 'react';
-import { Navigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import React, { useEffect } from "react";
+import { Navigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 const PrivateRoute = ({ children }) => {
   const { user, loading } = useAuth();
 
+  // While checking authentication & refreshing tokens
   if (loading) {
     return (
-      <div className="container">
-        <div className="loading">Loading...</div>
+      <div style={{ textAlign: "center", paddingTop: "40px", fontSize: "18px" }}>
+        Checking Authentication...
       </div>
     );
   }
 
-  return user ? children : <Navigate to="/login" replace />;
+  // If no user and no session, redirect to login
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  // User is authenticated
+  return <>{children}</>;
 };
 
 export default PrivateRoute;

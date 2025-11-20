@@ -1,69 +1,109 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import axios from 'axios';
+import { createContext, useState, useEffect, useContext } from "react";
+import axios from "axios";
 
-// Create Context
-const AuthContext = createContext();
+export const AuthContext = createContext();
 
-// Provider Component
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  // Load user from localStorage on mount
+  const API = "http://localhost:5000/api/users";
+
+  const tryAutoLogin = async () => {
+    const sessionRefreshToken = sessionStorage.getItem("refreshToken");
+    const localRefreshToken = localStorage.getItem("refreshToken");
+
+    // highest priority if session has one (normal login)
+    const refreshToken = sessionRefreshToken || localRefreshToken;
+
+    if (!refreshToken) {
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const res = await axios.post(`${API}/refresh-token`, { refreshToken });
+      sessionStorage.setItem("accessToken", res.data.accessToken);
+
+      // Load user from session or localStorage
+      const savedUser =
+        sessionStorage.getItem("userData") ||
+        localStorage.getItem("userData");
+
+      if (savedUser) {
+        setUser(JSON.parse(savedUser));
+      } else {
+        setUser({ loggedIn: true });
+      }
+    } catch (err) {
+      logout();
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const savedUser = localStorage.getItem('user');
-    if (savedUser) setUser(JSON.parse(savedUser));
+    tryAutoLogin();
   }, []);
 
-  // ✅ Login function
-  const login = async (email, password) => {
-    setLoading(true);
+  const login = async (email, password, rememberMe = false) => {
     try {
-      const res = await axios.post('http://localhost:5000/api/login', { email, password });
-      setUser(res.data.user);
-      localStorage.setItem('user', JSON.stringify(res.data.user));
-      return res.data;
+      const body = password ? { email, password, rememberMe } : { email, rememberMe };
+      const res = await axios.post(`${API}/login`, body);
+
+      const { accessToken, refreshToken, user } = res.data;
+
+      sessionStorage.setItem("accessToken", accessToken);
+      sessionStorage.setItem("refreshToken", refreshToken);
+      sessionStorage.setItem("userData", JSON.stringify(user));
+
+      if (rememberMe) {
+        localStorage.setItem("refreshToken", refreshToken);
+        localStorage.setItem("userData", JSON.stringify(user));
+      }
+
+      setUser(user);
+      return true;
     } catch (err) {
-      throw new Error(err.response?.data?.message || 'Login failed');
-    } finally {
-      setLoading(false);
+      throw new Error(err.response?.data?.message || "Login failed");
     }
   };
 
-  // ✅ Register function
+  const completeOtpLogin = (accessToken, refreshToken, userData, rememberMe = false) => {
+    sessionStorage.setItem("accessToken", accessToken);
+    sessionStorage.setItem("refreshToken", refreshToken);
+    sessionStorage.setItem("userData", JSON.stringify(userData));
+
+    if (rememberMe) {
+      localStorage.setItem("refreshToken", refreshToken);
+      localStorage.setItem("userData", JSON.stringify(userData));
+    }
+
+    setUser(userData);
+  };
+
   const register = async (name, email, password) => {
-    setLoading(true);
     try {
-      const res = await axios.post('http://localhost:5000/api/signup', { name, email, password });
-      return res.data;
+      const res = await axios.post(`${API}/signup`, { name, email, password });
+      if (res.status !== 201) throw new Error("Signup failed");
+      return true;
     } catch (err) {
-      throw new Error(err.response?.data?.message || 'Signup failed');
-    } finally {
-      setLoading(false);
+      throw new Error(err.response?.data?.message || "Signup failed");
     }
   };
 
-  // ✅ Logout function
   const logout = () => {
-    localStorage.removeItem('user');
+    sessionStorage.clear();
+    localStorage.removeItem("refreshToken");
+    localStorage.removeItem("userData");
     setUser(null);
   };
 
-  // ✅ Context value
-  const value = {
-    user,
-    loading,
-    login,
-    register,
-    logout,
-  };
-
   return (
-    <AuthContext.Provider value={value}>
-      {children}
+    <AuthContext.Provider value={{ user, loading, login, register, logout, completeOtpLogin }}>
+      {!loading && children}
     </AuthContext.Provider>
   );
 };
 
-// ✅ Custom hook for easy access
 export const useAuth = () => useContext(AuthContext);

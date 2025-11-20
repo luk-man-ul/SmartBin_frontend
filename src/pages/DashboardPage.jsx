@@ -6,33 +6,42 @@ import { FaQrcode, FaListAlt, FaSignOutAlt } from 'react-icons/fa';
 const DashboardPage = () => {
   const [points, setPoints] = useState(0);
   const [loading, setLoading] = useState(true);
-  const { user, logout } = useAuth();
+  const { user, token, logout } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Simulate fetching reward points
-    const fetchPoints = () => {
-      setTimeout(() => {
-        setPoints(Math.floor(Math.random() * 1000) + 100); // Random points between 100-1100
+    if (!user) return;
+
+    const fetchPoints = async () => {
+      try {
+        const res = await fetch(`http://localhost:5000/api/users/${user._id}`, {
+          headers: {
+            Authorization: `Bearer ${token || localStorage.getItem("token")}`,
+          },
+        });
+
+        const data = await res.json();
+
+        if (data && data.rewardPoints !== undefined) {
+          setPoints(data.rewardPoints);
+        }
+      } catch (err) {
+        console.error("Error fetching points:", err);
+      } finally {
         setLoading(false);
-      }, 1000);
+      }
     };
 
     fetchPoints();
-  }, []);
+  }, [user, token]);
 
   const handleLogout = () => {
     logout();
     navigate('/login');
   };
 
-  const navigateToScanner = () => {
-    navigate('/scan');
-  };
-
-  const navigateToHistory = () => {
-    navigate('/history');
-  };
+  const gotoScanner = () => navigate('/scan');
+  const gotoHistory = () => navigate('/history');
 
   if (loading) {
     return (
@@ -46,7 +55,7 @@ const DashboardPage = () => {
     <div className="container">
       <div className="card">
         <div className="dashboard-stats">
-          <h2>Welcome, {user?.username}!</h2>
+          <h2>Welcome, {user?.name || "User"}!</h2>
           <p style={{ color: '#6c757d', marginBottom: '16px' }}>
             Your current reward balance:
           </p>
@@ -54,25 +63,15 @@ const DashboardPage = () => {
         </div>
         
         <div className="dashboard-actions">
-          <button 
-            className="btn btn-success"
-            onClick={navigateToScanner}
-          >
+          <button className="btn btn-success" onClick={gotoScanner}>
             <FaQrcode /> Scan QR Code
           </button>
           
-          <button 
-            className="btn btn-secondary"
-            onClick={navigateToHistory}
-          >
+          <button className="btn btn-secondary" onClick={gotoHistory}>
             <FaListAlt /> View Reward History
           </button>
           
-          <button 
-            className="btn btn-danger"
-            onClick={handleLogout}
-            style={{ marginTop: '24px' }}
-          >
+          <button className="btn btn-danger" onClick={handleLogout} style={{ marginTop: '24px' }}>
             <FaSignOutAlt /> Logout
           </button>
         </div>
@@ -81,10 +80,10 @@ const DashboardPage = () => {
       <div className="card">
         <h3 style={{ marginBottom: '16px' }}>How it works:</h3>
         <ol style={{ paddingLeft: '20px', lineHeight: '1.6' }}>
-          <li>Scan the QR code on a smart bottle return bin</li>
-          <li>Insert your bottles into the bin</li>
-          <li>Earn reward points for each bottle returned</li>
-          <li>Redeem points for rewards and discounts</li>
+          <li>Place your bottles into the detection area of SmartBin.</li>
+           <li>After successful deposit of bottles scan the QR code on the SmartBin.</li>
+          <li>Earn reward points for each bottle returned.</li>
+          <li>Redeem points for rewards and discounts : integrated in future.</li>
         </ol>
       </div>
     </div>
