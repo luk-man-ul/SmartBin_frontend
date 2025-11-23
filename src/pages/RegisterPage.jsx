@@ -9,7 +9,6 @@ const RegisterPage = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
   
   const { register } = useAuth();
   const navigate = useNavigate();
@@ -17,7 +16,6 @@ const RegisterPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    setSuccess('');
 
     if (password !== confirmPassword) {
       setError('Passwords do not match');
@@ -29,10 +27,8 @@ const RegisterPage = () => {
     try {
       await register(name, email, password);
 
-      setSuccess('Registration successful! Redirecting...');
-      setTimeout(() => {
-        navigate('/login');
-      }, 1500);
+      // 🔥 Auto-login already done in AuthContext
+      navigate('/dashboard');
 
     } catch (err) {
       setError(err.message);
@@ -50,11 +46,11 @@ const RegisterPage = () => {
         <p style={{ textAlign: 'center', marginBottom: '24px', color: '#6c757d', fontSize: '14px' }}>
           Create your eco-friendly account
         </p>
-        
+
         <div className="demo-notice">
           <strong>Note:</strong> Data will be saved to the database.
         </div>
-        
+
         <form onSubmit={handleSubmit} autoComplete="off">
 
           <div className="form-group">
@@ -82,7 +78,7 @@ const RegisterPage = () => {
               placeholder="Enter your email"
             />
           </div>
-          
+
           <div className="form-group">
             <label htmlFor="password">Password</label>
             <input
@@ -95,7 +91,7 @@ const RegisterPage = () => {
               placeholder="Choose a password"
             />
           </div>
-          
+
           <div className="form-group">
             <label htmlFor="confirmPassword">Confirm Password</label>
             <input
@@ -108,10 +104,9 @@ const RegisterPage = () => {
               placeholder="Confirm your password"
             />
           </div>
-          
+
           {error && <div className="error">{error}</div>}
-          {success && <div className="success">{success}</div>}
-          
+
           <button 
             type="submit" 
             className="btn btn-primary"
@@ -120,7 +115,7 @@ const RegisterPage = () => {
             {loading ? 'Creating Account...' : 'Create Account'}
           </button>
         </form>
-        
+
         <p style={{ textAlign: 'center', marginTop: '16px', fontSize: '14px' }}>
           Already have an account?{' '}
           <Link to="/login">Sign in here</Link>

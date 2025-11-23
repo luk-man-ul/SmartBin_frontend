@@ -81,11 +81,21 @@ export const AuthProvider = ({ children }) => {
 
     setUser(userData);
   };
-
+    
   const register = async (name, email, password) => {
     try {
       const res = await axios.post(`${API}/signup`, { name, email, password });
-      if (res.status !== 201) throw new Error("Signup failed");
+
+      const { accessToken, refreshToken, user } = res.data;
+
+      // 🔥 Store tokens exactly like login()
+      sessionStorage.setItem("accessToken", accessToken);
+      sessionStorage.setItem("refreshToken", refreshToken);
+      sessionStorage.setItem("userData", JSON.stringify(user));
+
+      // 🔥 Auto-login user
+      setUser(user);
+
       return true;
     } catch (err) {
       throw new Error(err.response?.data?.message || "Signup failed");

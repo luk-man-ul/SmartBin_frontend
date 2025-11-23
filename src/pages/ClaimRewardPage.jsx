@@ -16,27 +16,22 @@ export default function ClaimRewardPage() {
   const didRun = useRef(false); // 🔥 prevents double execution
 
   useEffect(() => {
-    // 🔥 StrictMode fix — run once only
     if (didRun.current) return;
     didRun.current = true;
 
-    // 1️⃣ Wait for auth
     if (loading) return;
 
-    // 2️⃣ Invalid QR
     if (!binId) {
       setMessage("Invalid QR code.");
       setClaiming(false);
       return;
     }
 
-    // 3️⃣ Not logged in → login
     if (!user) {
       navigate("/login");
       return;
     }
 
-    // 4️⃣ Claim reward
     const claimReward = async () => {
       try {
         const res = await fetch("http://localhost:5000/api/bin/claim", {
@@ -79,6 +74,25 @@ export default function ClaimRewardPage() {
       <h2>Reward Claim</h2>
       <p>{message}</p>
       {claiming && <p>Please wait...</p>}
+
+      {/* ✅ BACK BUTTON */}
+      {!claiming && (
+        <button
+          onClick={() => navigate("/dashboard")}
+          style={{
+            marginTop: "20px",
+            padding: "10px 18px",
+            borderRadius: "6px",
+            border: "none",
+            backgroundColor: "#1c807aff",
+            color: "white",
+            cursor: "pointer",
+            fontSize: "16px"
+          }}
+        >
+          Back to Dashboard
+        </button>
+      )}
     </div>
   );
 }
