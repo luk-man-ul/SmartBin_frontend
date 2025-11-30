@@ -34,7 +34,7 @@ export default function ClaimRewardPage() {
 
     const claimReward = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/bin/claim", {
+        const res = await fetch("https://smartbin-backend-gptt.onrender.com/api/bin/claim", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

@@ -13,7 +13,7 @@ export default function RewardHistoryPage() {
 
     const fetchHistory = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/history/${user._id}`);
+        const res = await fetch(`https://smartbin-backend-gptt.onrender.com/api/history/${user._id}`);
         const data = await res.json();
         setHistory(data);
       } catch (err) {

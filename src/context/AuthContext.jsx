@@ -7,7 +7,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const API = "http://localhost:5000/api/users";
+  const API = "https://smartbin-backend-gptt.onrender.com/api/users";
 
   const tryAutoLogin = async () => {
     const sessionRefreshToken = sessionStorage.getItem("refreshToken");

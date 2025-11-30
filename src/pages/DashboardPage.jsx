@@ -14,7 +14,7 @@ const DashboardPage = () => {
 
     const fetchPoints = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/users/${user._id}`, {
+        const res = await fetch(`https://smartbin-backend-gptt.onrender.com/api/users/${user._id}`, {
           headers: {
             Authorization: `Bearer ${token || localStorage.getItem("token")}`,
           },

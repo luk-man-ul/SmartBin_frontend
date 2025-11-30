@@ -16,7 +16,7 @@ const ForgotPasswordPage = () => {
     setLoading(true);
 
     try {
-      const res = await fetch("http://localhost:5000/api/users/forgot-password", {
+      const res = await fetch("https://smartbin-backend-gptt.onrender.com/api/users/forgot-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
