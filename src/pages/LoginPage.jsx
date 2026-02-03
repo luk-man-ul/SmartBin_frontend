@@ -103,7 +103,7 @@ const LoginPage = () => {
         </p>
          
         <p style={{ textAlign: 'center', marginTop: '10px', fontSize: '16px' }}>
-          Don't have an account?{' '}
+          Don't have an account ?{' '}
           <Link to="/register">Create one here</Link>
         </p>
       </div>

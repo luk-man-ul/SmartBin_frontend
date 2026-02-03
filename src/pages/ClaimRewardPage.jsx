@@ -53,7 +53,7 @@ export default function ClaimRewardPage() {
           return;
         }
 
-        setMessage(`Success! You earned ${data.reward} points!`);
+        setMessage(`Success! You earned ${data.reward} points! Thank you .Use again`);
 
         setTimeout(() => {
           navigate("/history");
