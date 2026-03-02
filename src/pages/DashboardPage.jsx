@@ -68,7 +68,7 @@ const DashboardPage = () => {
           </button>
           
           <button className="btn btn-secondary" onClick={gotoHistory}>
-            <FaListAlt /> View Reward History
+            <FaListAlt /> View your Reward History
           </button>
           
           <button className="btn btn-danger" onClick={handleLogout} style={{ marginTop: '24px' }}>
